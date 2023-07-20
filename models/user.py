@@ -6,6 +6,6 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(14), unique=True, nullable=False)
     password = db.Column(db.String(16), nullable=False)
-    short_url = db.relationship("URLModel", back_populates="user", lazy="dynamic")
+    url_info = db.relationship("URLModel", back_populates="user", lazy="dynamic")
 
 

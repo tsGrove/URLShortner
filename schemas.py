@@ -13,4 +13,4 @@ class PLainURLSchema(Schema):
     custom_url = fields.Str()
 
 class UserSchema(PlainUserSchema):
-    short_url = fields.List(fields.Nested(PLainURLSchema()), dump_only=True)
+    url_info = fields.List(fields.Nested(PLainURLSchema()), dump_only=True)

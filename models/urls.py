@@ -8,5 +8,5 @@ class URLModel(db.Model):
     short_url = db.Column(db.String(), unique=True, nullable=False)
     custom_url = db.Column(db.String(), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), unique=False, nullable=False)
-    user = db.relationship("UserModel", back_populates="short_url")
+    user = db.relationship("UserModel", back_populates="url_info")
 
