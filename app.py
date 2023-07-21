@@ -2,7 +2,15 @@ from flask import Flask, jsonify, request, redirect
 from flask_smorest import Api
 
 from db import db
-
+""" FOR LOGGING PURPOSES"""
+import logging
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+engine = create_engine("sqlite:///data.db")
+Session = sessionmaker(bind=engine)
+session = Session()
 
 from resources.user import blp as UserBlueprint
 from resources.urls import blp as URLBlueprint

@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
@@ -46,8 +47,12 @@ class UserList(MethodView):
         return UserModel.query.all()
 
 @blp.route("/user/name/<string:username>")
-class User(MethodView):
+class UserSearch(MethodView):
     @blp.response(200, UserSchema)
     def get(self, username):
-        user = UserModel.query.get_or_404(username)
-        return user
+        user = UserModel.query.filter_by(username=username).first()
+        if user:
+            return user
+        else:
+            return jsonify({ "message": "User could not be found" }), 404
+    # if URLModel.query.filter(URLModel.custom_url == url_data["custom_url"]).first():

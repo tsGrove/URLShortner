@@ -60,6 +60,8 @@ class URLInfo(MethodView):
 class URLRedirection(MethodView):
     @blp.response(200, PLainURLSchema)
     def get(self, short_url):
-        print("DICKS")
-        url = URLModel.query.get_or_404(short_url)
-        return {"original_url":url.short_url}
+        url = URLModel.query.filter_by(short_url=short_url).first()
+        if url:
+            return url
+        else:
+             return jsonify({ "message": "URL could not be found" }), 404
