@@ -38,7 +38,7 @@ class User(MethodView):
         user = UserModel.query.get_or_404(user_id)
         db.session.delete(user)
         db.session.commit()
-        return {"message": "User deleted."}, 200
+        return {"message": f"User {user.username} deleted."}, 200
 
 @blp.route("/users/all")
 class UserList(MethodView):

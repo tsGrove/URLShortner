@@ -64,6 +64,6 @@ class URLRedirection(MethodView):
         print(searchable_short_url)
         url = URLModel.query.filter_by(searchable_short_url=searchable_short_url).first()
         if url:
-            return url
+            return {"original_url": url.original_url}
         else:
-             return jsonify({ "message": "URL could not be found" }), 404
+             return jsonify({ "message": f"www.shorturl.com./{searchable_short_url} could not be found." }), 404
