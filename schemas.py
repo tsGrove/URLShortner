@@ -10,6 +10,7 @@ class PLainURLSchema(Schema):
     original_url = fields.Str(required=True)
     user_id = fields.Int(required=True)
     short_url = fields.Str(required=True)
+    searchable_short_url = fields.Str(required=True)
     custom_url = fields.Str()
 
 class UserSchema(PlainUserSchema):

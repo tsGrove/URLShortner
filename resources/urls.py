@@ -22,6 +22,7 @@ class URLs(MethodView):
         characters = string.ascii_letters + string.digits
         generated_string = ''.join(random.choices(characters, k=length))
         random_url = f"www.shorturl.com//{generated_string}"
+        url.searchable_short_url = generated_string
         url.short_url = random_url
 
         if URLModel.query.filter(URLModel.custom_url == url_data["custom_url"]).first():
@@ -56,11 +57,12 @@ class URLInfo(MethodView):
         db.session.commit()
         return {"message" : f"The url {url.original_url} has successfully been deleted."}
 
-@blp.route("/url/redirect/<string:short_url>")
+@blp.route("/url/redirect/<string:searchable_short_url>")
 class URLRedirection(MethodView):
     @blp.response(200, PLainURLSchema)
-    def get(self, short_url):
-        url = URLModel.query.filter_by(short_url=short_url).first()
+    def get(self, searchable_short_url):
+        print(searchable_short_url)
+        url = URLModel.query.filter_by(searchable_short_url=searchable_short_url).first()
         if url:
             return url
         else:
