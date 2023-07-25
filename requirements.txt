@@ -6,4 +6,5 @@ flask-sqlalchemy
 flask-jwt-extended
 passlib
 flask-migrate
+alembic~=1.11.1
 marshmallow~=3.19.0

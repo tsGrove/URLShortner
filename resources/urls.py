@@ -2,8 +2,10 @@ import random
 import string
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
+from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import SQLAlchemyError
 from flask import jsonify
+
 
 from db import db
 from models import URLModel
@@ -13,6 +15,7 @@ blp = Blueprint("URLs", "urls", description='Operations on urls')
 
 @blp.route("/url/add-url")
 class URLs(MethodView):
+    @jwt_required()
     @blp.arguments(PLainURLSchema)
     @blp.response(201, PLainURLSchema)
     def post(self, url_data):
@@ -51,6 +54,7 @@ class URLInfo(MethodView):
         url = URLModel.query.get_or_404(url_id)
         return url
 
+    @jwt_required()
     def delete(self, url_id):
         url = URLModel.query.get_or_404(url_id)
         db.session.delete(url)
