@@ -7,9 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask import jsonify
 
 
-from db import db
+from main.db import db
 from models import URLModel
-from schemas import PLainURLSchema
+from main.schemas import PLainURLSchema
 
 blp = Blueprint("URLs", "urls", description='Operations on urls')
 
