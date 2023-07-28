@@ -4,13 +4,16 @@ from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required, get_jwt
 
-from main.db import db
-from main.blocklist import BLOCKLIST
+from db import db
+from blocklist import BLOCKLIST
 from models import UserModel
-from main.schemas import UserSchema
+from schemas import UserSchema
 
 blp = Blueprint("Users", "users", description="Operations on users")
 
+# Registers the user in the database using a username and password provided by the user. A query is run to ensure that
+# The username provided does not already exist in the database, the password is then hashed using the passlib library
+# and added into the database alongside the username.
 @blp.route("/user/register")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
@@ -28,6 +31,9 @@ class UserRegister(MethodView):
 
         return {"message":f"User {user.username} successfully added!"}, 201
 
+# User provides a username and password, the password is then ran through the passlib library and if it matches with
+# What the database has stored the user is successfully logged in and provided an access token and a refresh tokens for
+# The end points which require one.
 @blp.route("/user/login")
 class UserLogin(MethodView):
     @blp.arguments(UserSchema)
@@ -49,6 +55,8 @@ class TokenRefresh(MethodView):
         new_token = create_access_token(identity=current_user, fresh=False)
         return {"access_token":new_token}
 
+# Takes the "jti" (JWT ID) and adds that to the blocklist set, preventing for a token being reused and ensuring a
+# Unique token for each user.
 @blp.route("/user/logout")
 class UserLogout(MethodView):
     @jwt_required()
@@ -57,6 +65,8 @@ class UserLogout(MethodView):
         BLOCKLIST.add(jti)
         return {"message": "Successfully logged out."}, 200
 
+# The user provides a user_id and is returned info about the user, including "username", and all urls associated with
+# The user.
 @blp.route("/user/id/<int:user_id>")
 class User(MethodView):
     @blp.response(200, UserSchema)
@@ -64,6 +74,7 @@ class User(MethodView):
         user = UserModel.query.get_or_404(user_id)
         return user
 
+# Deletes a user from the database.
     @jwt_required(fresh=True)
     def delete(self, user_id):
         user = UserModel.query.get_or_404(user_id)
@@ -71,12 +82,14 @@ class User(MethodView):
         db.session.commit()
         return {"message": f"User {user.username} deleted."}, 200
 
+# Returns a list of all users in the database.
 @blp.route("/users/all")
 class UserList(MethodView):
     @blp.response(200, UserSchema(many=True))
     def get(self):
         return UserModel.query.all()
 
+# Functions similarly to the user_id search except that this search allows the user of usernames instead of user_ids.
 @blp.route("/user/name/<string:username>")
 class UserSearch(MethodView):
     @blp.response(200, UserSchema)

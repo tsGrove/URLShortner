@@ -7,17 +7,6 @@ from blocklist import BLOCKLIST
 
 from db import db
 
-""" FOR LOGGING PURPOSES"""
-import logging
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-engine = create_engine("sqlite:///data.db")
-Session = sessionmaker(bind=engine)
-session = Session()
-""" REMOVE BEFORE PROD"""
-
 from resources.user import blp as UserBlueprint
 from resources.urls import blp as URLBlueprint
 
@@ -26,8 +15,9 @@ def create_app(db_url=None):
     app = Flask(__name__)
     app.debug = True
 
+    # App configurations as well as Swagger UI config.
     app.config["PROPAGATE_EXCEPTIONS"] = True
-    app.config["API_TITLE"] = "Stores REST API"
+    app.config["API_TITLE"] = "URL Shortener REST API"
     app.config['API_VERSION'] = "v1"
     app.config['OPENAPI_VERSION'] = "3.0.3"
     app.config["OPEN_URL_PREFIx"] = "/"
@@ -39,9 +29,12 @@ def create_app(db_url=None):
     migrate = Migrate(app, db)
     api = Api(app)
 
+    # The secret JWT server key saved as an environment variable.
     app.config["JWT_SECRET_KEY"] = JWT_KEY
     jwt = JWTManager(app)
 
+    # A list of functions pertaining to JWT Tokens for expired tokens, revoked tokens, invalid tokens, and the lack
+    # of a token in general.
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blocklist(jwt_header, jwt_payload):
         return jwt_payload["jti"] in BLOCKLIST
@@ -67,9 +60,11 @@ def create_app(db_url=None):
     def missing_token_callback(error):
         return jsonify({"description": "Request does not contain an access token.", "error": "authorization_required"}), 401
 
+    # Registers the blueprints defined in the resources file that contain all the endpoints.
     api.register_blueprint(UserBlueprint)
     api.register_blueprint(URLBlueprint)
 
+    # Using a context manager the sql lite database is created if it doesn't already exist.
     with app.app_context():
         db.create_all()
 

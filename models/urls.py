@@ -1,4 +1,4 @@
-from main.db import db
+from db import db
 
 class URLModel(db.Model):
     __tablename__ = "urls"
